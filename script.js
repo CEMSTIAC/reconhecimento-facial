@@ -1,7 +1,7 @@
 const video = document.getElementById('video');
 
 async function carregarModelos() {
-  const MODEL_URL = '/models';
+  const MODEL_URL = './models'; // pasta local com os modelos
 
   await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
   await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
@@ -20,10 +20,8 @@ async function iniciarVideo() {
 
 async function main() {
   await carregarModelos();
-  await iniciarVideo();
+  iniciarVideo();
 }
-
-main(); // Executa tudo
 
 async function enviarPresenca() {
   const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
@@ -53,6 +51,7 @@ async function enviarPresenca() {
   } else {
     alert("Nenhum rosto detectado. Tente novamente.");
   }
-  main(); // chama a função após os modelos carregarem
-
 }
+
+// Chama a função principal
+main();
