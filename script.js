@@ -1,12 +1,8 @@
 const video = document.getElementById('video');
-const video = document.getElementById('video');
 
-navigator.mediaDevices.getUserMedia({ video: true })
+navigator.mediaDevices.getUserMedia({ video: {} })
   .then(stream => {
     video.srcObject = stream;
-  })
-  .catch(err => {
-    console.error("Erro ao acessar a câmera: ", err);
   });
 
 async function carregarModelos() {
