@@ -10,8 +10,14 @@ window.addEventListener('load', async () => {
     return;
   }
 
-  await faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
-  console.log("Modelos carregados com sucesso!");
+  try {
+    await faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
+    console.log("Modelos carregados com sucesso!");
+  } catch (err) {
+    console.error("Erro ao carregar modelos: ", err);
+    alert("Erro ao carregar modelos de detecção facial.");
+    return;
+  }
 
   window.enviarPresenca = async function () {
     const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
@@ -41,5 +47,5 @@ window.addEventListener('load', async () => {
     } else {
       alert("Nenhum rosto detectado. Tente novamente.");
     }
-  }
+  };
 });
