@@ -1,11 +1,10 @@
-cdocument.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const video = document.getElementById('video');
 
   // Aguarda o carregamento dos modelos
   await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
   await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
   await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-
   console.log("Modelos carregados!");
 
   // Inicia a câmera
@@ -15,7 +14,7 @@ cdocument.addEventListener("DOMContentLoaded", async () => {
     })
     .catch(err => console.error("Erro ao acessar a câmera:", err));
 
-  // Função para enviar a presença
+  // Função global para o botão
   window.enviarPresenca = async () => {
     const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
 
