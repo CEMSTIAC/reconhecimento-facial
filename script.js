@@ -1,10 +1,10 @@
 const video = document.getElementById('video');
 
 async function carregarModelos() {
-  await faceapi.nets.tinyFaceDetector.loadFromUri('/modelos');
-  await faceapi.nets.faceLandmark68Net.loadFromUri('/modelos');
-  await faceapi.nets.faceRecognitionNet.loadFromUri('/modelos');
-  await faceapi.nets.ssdMobilenetv1.loadFromUri('/modelos');
+  await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+  await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+  await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+  await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
 }
 
 async function startVideo() {
