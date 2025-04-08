@@ -3,17 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <title>Reconhecimento Facial CEMSTIAC</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <script defer src="script.js"></script>
 </head>
 <body>
   <h2>Reconhecimento Facial - CEMSTIAC</h2>
   <video id="video" width="720" height="560" autoplay muted></video>
   <br />
   <button onclick="enviarPresenca()">Enviar Presença</button>
-
-  <!-- Carrega face-api.js versão correta para navegador -->
-  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-
-  <!-- Seu script principal -->
-  <script src="script.js"></script>
 </body>
 </html>
