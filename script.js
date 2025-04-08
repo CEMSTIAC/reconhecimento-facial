@@ -53,4 +53,6 @@ async function enviarPresenca() {
   } else {
     alert("Nenhum rosto detectado. Tente novamente.");
   }
+  main(); // chama a função após os modelos carregarem
+
 }
