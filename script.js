@@ -1,15 +1,29 @@
 const video = document.getElementById('video');
 
-navigator.mediaDevices.getUserMedia({ video: {} })
-  .then(stream => {
-    video.srcObject = stream;
-  });
-
 async function carregarModelos() {
-  await faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
+  const MODEL_URL = '/models';
+
+  await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+  console.log("Modelos carregados!");
 }
 
-carregarModelos();
+async function iniciarVideo() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+    video.srcObject = stream;
+  } catch (err) {
+    console.error("Erro ao acessar a câmera:", err);
+  }
+}
+
+async function main() {
+  await carregarModelos();
+  await iniciarVideo();
+}
+
+main(); // Executa tudo
 
 async function enviarPresenca() {
   const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
@@ -39,12 +53,4 @@ async function enviarPresenca() {
   } else {
     alert("Nenhum rosto detectado. Tente novamente.");
   }
-}
-async function carregarModelos() {
-  const MODEL_URL = '/models'; // Caminho para os modelos
-
-  await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-  await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-  await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-  console.log("Modelos carregados!");
 }
