@@ -40,3 +40,11 @@ async function enviarPresenca() {
     alert("Nenhum rosto detectado. Tente novamente.");
   }
 }
+async function carregarModelos() {
+  const MODEL_URL = '/models'; // Caminho para os modelos
+
+  await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+  console.log("Modelos carregados!");
+}
