@@ -1,52 +1,25 @@
+const video = document.getElementById('video');
+
 async function carregarModelos() {
-  await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-  await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-  await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-  console.log("Modelos carregados!");
+  await faceapi.nets.tinyFaceDetector.loadFromUri('/modelos');
+  await faceapi.nets.faceLandmark68Net.loadFromUri('/modelos');
+  await faceapi.nets.faceRecognitionNet.loadFromUri('/modelos');
+  await faceapi.nets.ssdMobilenetv1.loadFromUri('/modelos');
 }
 
-async function iniciarVideo() {
-  const video = document.getElementById('video');
+async function startVideo() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
     video.srcObject = stream;
   } catch (err) {
-    console.error("Erro ao acessar a câmera:", err);
+    console.error('Erro ao acessar a câmera:', err);
+    alert('Erro ao acessar a câmera: ' + err.message);
   }
 }
 
 async function main() {
   await carregarModelos();
-  iniciarVideo();
+  await startVideo();
 }
 
 main();
-
-// Função global para ser chamada no botão
-async function enviarPresenca() {
-  const video = document.getElementById('video');
-  const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-
-  if (detections.length > 0) {
-    const nome = prompt("Reconhecimento facial detectado. Digite o nome:");
-    if (nome) {
-      const url = 'https://script.google.com/macros/s/AKfycbxVebTOg-k9nEjedinRO0E2GbO1QP6cv_PFIQpB8zk3Ksx5q5tWiSEd7rfJn9PMywVK/exec';
-      const data = {
-        nome: nome,
-        hora: new Date().toLocaleTimeString(),
-        data: new Date().toLocaleDateString()
-      };
-
-      fetch(url, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      alert("Presença registrada com sucesso!");
-    }
-  } else {
-    alert("Nenhum rosto detectado.");
-  }
-}
