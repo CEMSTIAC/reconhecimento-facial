@@ -1,104 +1,90 @@
-const video = document.getElementById('video');
-const statusEl = document.getElementById('status');
-
-const PLANILHA_DADOS_URL = 'https://docs.google.com/spreadsheets/d/1UzzuE4kERhznDw76NuAaHjXxMbWYqNXshLle5ZZ4eHo/edit?usp=sharing';
-
-let labeledDescriptors = [];
-
-async function startVideo() {
+function doPost(e) {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-    video.srcObject = stream;
-  } catch (error) {
-    console.error('Erro ao acessar a câmera:', error);
+    const ss = SpreadsheetApp.openById("https://docs.google.com/spreadsheets/d/1UzzuE4kERhznDw76NuAaHjXxMbWYqNXshLle5ZZ4eHo");
+    const wsAlunos = ss.getSheetByName("Aluno");
+    const wsDados = ss.getSheetByName("Dados");
+
+    const data = JSON.parse(e.postData.contents);
+    const imagemBase64 = data.image;
+
+    if (!imagemBase64) {
+      return ContentService.createTextOutput(JSON.stringify({ message: "Imagem não recebida." }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const alunos = wsAlunos.getDataRange().getValues();
+    let alunoReconhecido = null;
+
+    // Simulação de comparação facial: procuramos a imagem na coluna A (índice 0)
+    for (let i = 1; i < alunos.length; i++) {
+      const urlImagem = alunos[i][0];
+      if (imagemBase64.includes(urlImagem.split("/").pop())) { // Checagem por similaridade simples
+        alunoReconhecido = {
+          imagem: urlImagem,
+          nome: alunos[i][1],
+          turma: alunos[i][2],
+          entradaEsperada: alunos[i][3],
+          saidaEsperada: alunos[i][4]
+        };
+        break;
+      }
+    }
+
+    if (!alunoReconhecido) {
+      return ContentService.createTextOutput(JSON.stringify({ message: "Aluno não reconhecido." }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Pega a data e hora atual
+    const agora = new Date();
+    const dataFormatada = Utilities.formatDate(agora, "GMT-3", "dd/MM/yyyy");
+    const horaFormatada = Utilities.formatDate(agora, "GMT-3", "HH:mm:ss");
+
+    // Verifica se já tem entrada ou saída hoje
+    const registros = wsDados.getDataRange().getValues();
+    let entradaHoje = null;
+    let saidaHoje = null;
+    for (let i = 1; i < registros.length; i++) {
+      if (
+        registros[i][2] === alunoReconhecido.nome &&
+        registros[i][4] === dataFormatada
+      ) {
+        if (registros[i][5]) entradaHoje = registros[i][5];
+        if (registros[i][6]) saidaHoje = registros[i][6];
+      }
+    }
+
+    let tipoRegistro = "";
+    if (!entradaHoje) {
+      tipoRegistro = "entrada";
+    } else if (!saidaHoje) {
+      tipoRegistro = "saida";
+    } else {
+      return ContentService.createTextOutput(JSON.stringify({ message: "Aluno já registrou entrada e saída hoje." }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Monta nova linha para salvar
+    const novaLinha = [
+      new Date().getTime(), // ID
+      alunoReconhecido.imagem,
+      alunoReconhecido.nome,
+      alunoReconhecido.turma,
+      dataFormatada,
+      tipoRegistro === "entrada" ? horaFormatada : "",
+      tipoRegistro === "saida" ? horaFormatada : "",
+      tipoRegistro === "entrada" ? "ENTRADA REGISTRADA" : "SAÍDA REGISTRADA"
+    ];
+
+    wsDados.appendRow(novaLinha);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ message: `Registro de ${tipoRegistro} feito para ${alunoReconhecido.nome}` }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ message: "Erro: " + err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }
-
-async function loadModels() {
-  const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js/models';
-  await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-  await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-  await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-}
-
-async function loadAlunosFromPlanilha() {
-  const response = await fetch(PLANILHA_DADOS_URL + '?action=alunos');
-  const data = await response.json(); // espera algo tipo: [{ nome: 'Maria', foto: 'url' }, ...]
-
-  const descriptors = await Promise.all(
-    data.map(async aluno => {
-      try {
-        const img = await faceapi.fetchImage(aluno.foto);
-        const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-        if (!detection) throw new Error(`Rosto não detectado para ${aluno.nome}`);
-        return new faceapi.LabeledFaceDescriptors(aluno.nome, [detection.descriptor]);
-      } catch (err) {
-        console.warn(`Erro ao processar ${aluno.nome}:`, err);
-        return null;
-      }
-    })
-  );
-
-  return descriptors.filter(Boolean); // remove nulls
-}
-
-function registrarPresenca(nome) {
-  const payload = {
-    nome: nome,
-    data: new Date().toLocaleDateString('pt-BR'),
-    hora: new Date().toLocaleTimeString('pt-BR')
-  };
-
-  fetch(PLANILHA_DADOS_URL, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }).then(() => {
-    statusEl.innerText = `Presença registrada para ${nome}`;
-  }).catch(err => {
-    console.error('Erro ao registrar presença:', err);
-  });
-}
-
-async function main() {
-  await loadModels();
-  statusEl.innerText = 'Carregando alunos...';
-  labeledDescriptors = await loadAlunosFromPlanilha();
-
-  const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.5);
-  statusEl.innerText = 'Iniciando câmera...';
-  await startVideo();
-
-  video.addEventListener('play', () => {
-    statusEl.innerText = 'Sistema ativo. Procure a câmera.';
-
-    const canvas = faceapi.createCanvasFromMedia(video);
-    document.body.append(canvas);
-    const displaySize = { width: video.width, height: video.height };
-    faceapi.matchDimensions(canvas, displaySize);
-
-    setInterval(async () => {
-      const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-
-      const resizedDetections = faceapi.resizeResults(detections, displaySize);
-      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
-      const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
-
-      results.forEach((result, i) => {
-        const box = resizedDetections[i].detection.box;
-        const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() });
-        drawBox.draw(canvas);
-
-        if (result.label !== 'unknown') {
-          statusEl.innerText = `Reconhecido: ${result.label}`;
-          registrarPresenca(result.label);
-        }
-      });
-    }, 4000); // detecta a cada 4 segundos
-  });
-}
-
-main();
