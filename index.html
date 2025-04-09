@@ -1,82 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reconhecimento Facial</title>
-    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reconhecimento Facial</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api.js"></script>
+  <script defer src="script.js"></script> <!-- certifique-se de que o nome do seu arquivo JS é esse -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 30px;
+      background-color: #f5f5f5;
+    }
+    video {
+      border: 2px solid #333;
+      border-radius: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
-    <h1>Reconhecimento Facial de Aluno</h1>
-    <video id="video" width="720" height="560" autoplay muted></video>
-    <button onclick="capturarFoto()">Capturar Foto</button>
-    <script>
-        // Inicialização do modelo
-        async function setup() {
-            await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-            startVideo();
-        }
-
-        // Inicia a captura de vídeo
-        function startVideo() {
-            navigator.mediaDevices.getUserMedia({ video: {} })
-                .then((stream) => {
-                    document.getElementById('video').srcObject = stream;
-                })
-                .catch((err) => console.error("Erro ao acessar a câmera:", err));
-        }
-
-        // Função para capturar a foto e fazer o reconhecimento
-        async function capturarFoto() {
-            const video = document.getElementById('video');
-            const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
-            if (detections.length > 0) {
-                // Para fins de exemplo, vamos enviar a primeira imagem detectada
-                const imageData = video.toDataURL();  // Converte a imagem para base64
-                const alunoIdentificado = detections[0].descriptor;  // Usamos o descritor do rosto para identificação
-
-                // Envia a imagem e os dados para o Google Apps Script
-                enviarParaPlanilhaGoogle(imageData, alunoIdentificado);
-            } else {
-                alert("Nenhum rosto detectado!");
-            }
-        }
-
-        // Função para enviar dados ao Google Apps Script
-        function enviarParaPlanilhaGoogle(imageData, alunoIdentificado) {
-            fetch("https://script.google.com/macros/s/AKfycbz9ZQ7xexs7iqxOvfX8XQiHEFMFVscvs4LBMSmNCYwxJnS9QXcxy64AsHEUexxubf1X/exec", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    image: imageData,
-                    alunoIdentificado: alunoIdentificado
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Aluno identificado e dados enviados!");
-                } else {
-                    alert("Erro ao identificar o aluno.");
-                }
-            })
-            .catch(error => {
-                console.error("Erro ao enviar os dados:", error);
-                alert("Erro na comunicação com o servidor.");
-            });
-        }
-
-        // Chama a função de configuração ao carregar a página
-        setup();
-    </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api.js"></script>
-<script defer src="./script.js"></script>
+  <h1>Reconhecimento Facial</h1>
+  <video id="video" width="720" height="560" autoplay muted></video>
+  <br/>
+  <button onclick="enviarPresenca()">Registrar Presença</button>
 </body>
 </html>
 
-</body>
-</html>
