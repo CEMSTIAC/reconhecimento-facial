@@ -1,4 +1,4 @@
-wconst video = document.getElementById('video');
+const video = document.getElementById('video');
 
 navigator.mediaDevices.getUserMedia({ video: {} })
   .then(stream => {
