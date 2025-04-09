@@ -29,7 +29,7 @@
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL('image/png');
 
-      fetch('https://script.google.com/macros/s/AKfycbzzHwECtaTJf7zZZDjoAwi8I423AKbyFxbrP0gyvnAXMVU9zmBAN52wB_l3cXvIt6kW/exec', {
+      fetch('https://docs.google.com/spreadsheets/d/1UzzuE4kERhznDw76NuAaHjXxMbWYqNXshLle5ZZ4eHo/edit?usp=sharing', {
         method: 'POST',
         body: JSON.stringify({ image: imageData }),
         headers: { 'Content-Type': 'application/json' }
