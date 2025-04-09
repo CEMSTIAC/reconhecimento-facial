@@ -2,13 +2,47 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Reconhecimento Facial - Presença</title>
-  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
-  <script defer src="script.js"></script>
+  <title>Reconhecimento Facial</title>
+  <style>
+    video, canvas { display: block; margin: 10px auto; }
+    button { display: block; margin: 10px auto; padding: 10px; }
+  </style>
 </head>
 <body>
-  <h1>Reconhecimento Facial de Alunos</h1>
-  <video id="video" width="720" height="560" autoplay muted></video>
-  <p id="status">Carregando modelos...</p>
+  <h2 style="text-align:center;">Sistema de Reconhecimento Facial</h2>
+  <video id="video" width="320" height="240" autoplay></video>
+  <canvas id="canvas" width="320" height="240" style="display: none;"></canvas>
+  <button onclick="captureAndSend()">Registrar</button>
+  <p id="result" style="text-align:center;"></p>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const result = document.getElementById('result');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => video.srcObject = stream)
+      .catch(err => alert("Erro ao acessar a câmera: " + err));
+
+    function captureAndSend() {
+      const context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL('image/png');
+
+      fetch('https://script.google.com/macros/s/AKfycbz9ZQ7xexs7iqxOvfX8XQiHEFMFVscvs4LBMSmNCYwxJnS9QXcxy64AsHEUexxubf1X/exec', {
+        method: 'POST',
+        body: JSON.stringify({ image: imageData }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        result.innerText = data.message;
+      })
+      .catch(err => {
+        result.innerText = "Erro ao enviar imagem.";
+        console.error(err);
+      });
+    }
+  </script>
 </body>
 </html>
