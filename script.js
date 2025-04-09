@@ -6,7 +6,12 @@ navigator.mediaDevices.getUserMedia({ video: {} })
   });
 
 async function carregarModelos() {
-  await faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
+  const MODEL_URL = '/models'; // Caminho para os modelos
+
+  await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+  console.log("Modelos carregados!");
 }
 
 carregarModelos();
