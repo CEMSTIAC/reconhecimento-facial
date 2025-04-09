@@ -1,7 +1,7 @@
 const video = document.getElementById('video');
 const statusEl = document.getElementById('status');
 
-const PLANILHA_DADOS_URL = 'https://script.google.com/macros/s/AKfycbz9ZQ7xexs7iqxOvfX8XQiHEFMFVscvs4LBMSmNCYwxJnS9QXcxy64AsHEUexxubf1X/exec';
+const PLANILHA_DADOS_URL = 'https://docs.google.com/spreadsheets/d/1UzzuE4kERhznDw76NuAaHjXxMbWYqNXshLle5ZZ4eHo/edit?usp=sharing';
 
 let labeledDescriptors = [];
 
