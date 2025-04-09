@@ -28,7 +28,7 @@ window.addEventListener('load', async () => {
       const nome = prompt("Reconhecimento facial detectado. Digite o nome para registrar:");
 
       if (nome) {
-        const url = 'https://script.google.com/a/macros/edu.campos.rj.gov.br/s/AKfycbxVebTOg-k9nEjedinRO0E2GbO1QP6cv_PFIQpB8zk3Ksx5q5tWiSEd7rfJn9PMywVK/exec';
+        const url = 'https://script.google.com/macros/s/AKfycbz9ZQ7xexs7iqxOvfX8XQiHEFMFVscvs4LBMSmNCYwxJnS9QXcxy64AsHEUexxubf1X/exec';
         const data = {
           nome: nome,
           hora: new Date().toLocaleTimeString(),
