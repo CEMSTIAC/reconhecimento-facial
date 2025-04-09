@@ -1,0 +1,19 @@
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+def conectar_google_sheets():
+    # Definir o escopo de acesso ao Google Sheets e Drive
+    escopo = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    credenciais = ServiceAccountCredentials.from_json_keyfile_name('caminho/para/seu/arquivo-de-credenciais.json', escopo)
+
+    # Conectar ao Google Sheets
+    cliente = gspread.authorize(credenciais)
+
+    # Abrir a planilha (substitua 'SuaPlanilha' pelo nome real da sua planilha)
+    planilha = cliente.open('SuaPlanilha').sheet1  # Primeira aba da planilha
+
+    # Obter todas as linhas da planilha
+    dados = planilha.get_all_records()
+
+    return dados
+
