@@ -11,7 +11,9 @@ window.addEventListener('load', async () => {
   }
 
   try {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+   // ou onde quer que seus modelos estejam
+
     console.log("Modelos carregados com sucesso!");
   } catch (err) {
     console.error("Erro ao carregar modelos: ", err);
