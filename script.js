@@ -1,5 +1,13 @@
-window.addEventListener('load', async () => {
-  const video = document.getElementById('video');
+window.onload = async function () {
+  console.log("Página carregada!");
+
+  await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
+  await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+  await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+
+  console.log("Modelos carregados com sucesso!");
+  
+  // Aqui vai o resto do seu código, tipo capturar vídeo, detectar rosto etc.
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
