@@ -1,13 +1,18 @@
 window.onload = async function () {
   console.log("Página carregada!");
 
-  await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
-  await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-  await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+  const video = document.getElementById('video');
 
-  console.log("Modelos carregados com sucesso!");
-  
-  // Aqui vai o resto do seu código, tipo capturar vídeo, detectar rosto etc.
+  try {
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    console.log("Modelos carregados com sucesso!");
+  } catch (err) {
+    console.error("Erro ao carregar modelos: ", err);
+    alert("Erro ao carregar modelos de detecção facial.");
+    return;
+  }
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
@@ -15,17 +20,6 @@ window.onload = async function () {
   } catch (err) {
     console.error("Erro ao acessar a câmera: ", err);
     alert("Erro ao acessar a câmera: " + err.message);
-    return;
-  }
-
-  try {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-   // ou onde quer que seus modelos estejam
-
-    console.log("Modelos carregados com sucesso!");
-  } catch (err) {
-    console.error("Erro ao carregar modelos: ", err);
-    alert("Erro ao carregar modelos de detecção facial.");
     return;
   }
 
@@ -58,4 +52,4 @@ window.onload = async function () {
       alert("Nenhum rosto detectado. Tente novamente.");
     }
   };
-});
+};
